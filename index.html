@@ -785,6 +785,58 @@
       box-shadow: 0 0 0 4px rgba(89,145,203,.12);
     }
 
+
+    .consent-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 2px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(89, 145, 203, .07);
+      border: 1px solid rgba(89, 145, 203, .14);
+      color: #344054;
+      line-height: 1.35;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .consent-field input {
+      width: 18px;
+      min-width: 18px;
+      height: 18px;
+      min-height: 18px;
+      margin-top: 2px;
+      accent-color: var(--red);
+      cursor: pointer;
+    }
+
+    .consent-field a {
+      color: var(--red);
+      font-weight: 850;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(160, 28, 23, .28);
+    }
+
+    .consent-field a:hover {
+      border-bottom-color: rgba(160, 28, 23, .72);
+    }
+
+    .btn-primary:disabled,
+    .btn-primary[disabled] {
+      background: #d8dce3;
+      color: rgba(52,64,84,.72);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary:disabled:hover,
+    .btn-primary[disabled]:hover {
+      box-shadow: none;
+      transform: none;
+    }
+
     .form-success {
       display: none;
       margin-top: 12px;
@@ -878,7 +930,7 @@
       .result-card { padding: 34px; }
     }
   </style>
-<script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000007798722f8fd6841feee4b3c4%26fn%3Dindex%25282%2529.html%26cd%3Dattachment%26ts%3D495230%26p%3Dfs%26cid%3D1%26sig%3D39c37e37346897f2183af2a25148a23c5278491adda19d2408ad78df2bfd5d38%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000001bd8722f95b140d031696d71%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D495230%26p%3Dfs%26cid%3D1%26sig%3Dc02563103d93bf02377bf5e786f0cf955e9587e7ea4734d255992a1a89140e3e%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 <body>
   <main class="page">
     <header class="topbar" aria-label="Фабрика Английского">
@@ -1001,7 +1053,13 @@
                 </select>
               </div>
               <div class="field full">
-                <button class="btn-primary" type="submit">Отправить</button>
+                <label class="consent-field" for="personalConsent">
+                  <input id="personalConsent" name="personalConsent" type="checkbox" required />
+                  <span>Я соглашаюсь с <a href="https://englishfactory.ru/soglasie" target="_blank" rel="noopener">обработкой персональных данных</a> и принимаю <a href="https://englishfactory.ru/politika" target="_blank" rel="noopener">Политику конфиденциальности</a>.</span>
+                </label>
+              </div>
+              <div class="field full">
+                <button class="btn-primary" type="submit" id="leadSubmitBtn" disabled>Отправить</button>
               </div>
             </div>
             <div class="form-success" id="formSuccess">Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.</div>
@@ -1317,6 +1375,14 @@
       showScreen("rules");
     });
 
+
+    const personalConsent = document.getElementById("personalConsent");
+    const leadSubmitBtn = document.getElementById("leadSubmitBtn");
+
+    personalConsent.addEventListener("change", () => {
+      leadSubmitBtn.disabled = !personalConsent.checked;
+    });
+
     document.getElementById("leadForm").addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -1358,12 +1424,13 @@
         formSuccess.textContent = "Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.";
         formSuccess.classList.add("show");
         form.reset();
+        personalConsent.checked = false;
       } catch (error) {
         formSuccess.textContent = "Не удалось отправить заявку. Попробуйте еще раз или напишите нам напрямую.";
         formSuccess.classList.add("show");
       } finally {
-        submitButton.disabled = false;
         submitButton.textContent = "Отправить";
+        submitButton.disabled = !personalConsent.checked;
       }
     });
 
