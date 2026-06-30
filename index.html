@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -877,7 +878,7 @@
       .result-card { padding: 34px; }
     }
   </style>
-<script type="text/javascript" nonce="92e9d0fff42649ecb2ac798e76d" src="//local.adguard.org?ts=1780320911974&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000dae0720a97cd68fb6dc2545f%26ts%3D494533%26p%3Dfs%26cid%3D1%26sig%3Dfa60fb932d579638da7f40d2cac356c9b668c2792360ac578613dac79d9e4c0a%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="92e9d0fff42649ecb2ac798e76d" src="//local.adguard.org?ts=1780320911974&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000007798722f8fd6841feee4b3c4%26fn%3Dindex%25282%2529.html%26cd%3Dattachment%26ts%3D495230%26p%3Dfs%26cid%3D1%26sig%3D39c37e37346897f2183af2a25148a23c5278491adda19d2408ad78df2bfd5d38%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 <body>
   <main class="page">
     <header class="topbar" aria-label="Фабрика Английского">
@@ -1109,12 +1110,14 @@
       "Advanced collocations": "Продвинутые collocations помогают звучать естественнее и точнее. На высоком уровне это часто важнее, чем учить отдельные слова."
     };
 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzY2NdD0aNaXXWVBtDG_dechUKi7ElmuB4QMtbafRkkQaAWbEA0Sq8mi1F5fQGvizCcaA/exec";
     const totalTime = 15 * 60;
     let currentIndex = 0;
     let answers = Array(questions.length).fill(null);
     let timeLeft = totalTime;
     let timerId = null;
     let isSubmitted = false;
+    let lastResult = null;
 
     const screens = {
       start: document.getElementById("startScreen"),
@@ -1151,6 +1154,7 @@
       answers = Array(questions.length).fill(null);
       timeLeft = totalTime;
       isSubmitted = false;
+      lastResult = null;
       updateTimer();
       renderQuestion();
     }
@@ -1235,6 +1239,17 @@
       const score = questions.reduce((sum, q, index) => sum + (answers[index] === q.correctIndex ? 1 : 0), 0);
       const levelKey = getLevel(score);
       const result = levelResults[levelKey];
+      const growthTopics = buildTopics(levelKey);
+      const wrongTopicCounts = getWrongTopicCounts();
+
+      lastResult = {
+        levelKey,
+        levelTitle: result.title,
+        score,
+        total: questions.length,
+        growthTopics,
+        wrongTopicCounts
+      };
 
       document.getElementById("resultLevel").textContent = result.title;
       document.getElementById("resultDescription").textContent = result.shortDescription;
@@ -1250,7 +1265,7 @@
 
       const topicsList = document.getElementById("topicsList");
       topicsList.innerHTML = "";
-      buildTopics(levelKey).forEach(topic => {
+      growthTopics.forEach(topic => {
         const node = document.createElement("div");
         node.className = "topic-item";
         node.innerHTML = `<strong>${topic}</strong><p>${topicAdvice[topic] || "Эту тему стоит отработать отдельно на практике."}</p>`;
@@ -1302,9 +1317,54 @@
       showScreen("rules");
     });
 
-    document.getElementById("leadForm").addEventListener("submit", (event) => {
+    document.getElementById("leadForm").addEventListener("submit", async (event) => {
       event.preventDefault();
-      document.getElementById("formSuccess").classList.add("show");
+
+      const form = event.currentTarget;
+      const submitButton = form.querySelector('button[type="submit"]');
+      const formSuccess = document.getElementById("formSuccess");
+
+      if (!lastResult) {
+        formSuccess.textContent = "Сначала завершите тест, чтобы мы получили ваш результат.";
+        formSuccess.classList.add("show");
+        return;
+      }
+
+      const payload = {
+        name: document.getElementById("name").value.trim(),
+        contact: document.getElementById("contact").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        goal: document.getElementById("goal").value,
+        level: lastResult.levelTitle,
+        score: `${lastResult.score}/${lastResult.total}`,
+        growthTopics: lastResult.growthTopics,
+        source: "english-factory-level-test"
+      };
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Отправляем...";
+      formSuccess.classList.remove("show");
+
+      try {
+        await fetch(WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        formSuccess.textContent = "Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.";
+        formSuccess.classList.add("show");
+        form.reset();
+      } catch (error) {
+        formSuccess.textContent = "Не удалось отправить заявку. Попробуйте еще раз или напишите нам напрямую.";
+        formSuccess.classList.add("show");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Отправить";
+      }
     });
 
     updateTimer();
