@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -930,7 +931,29 @@
       .result-card { padding: 34px; }
     }
   </style>
-<script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000001bd8722f95b140d031696d71%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D495230%26p%3Dfs%26cid%3D1%26sig%3Dc02563103d93bf02377bf5e786f0cf955e9587e7ea4734d255992a1a89140e3e%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="f65fb6da6ad34e0b92f944df968" src="//local.adguard.org?ts=1782918007308&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000b3dc722f888a97be031b67b2%26fn%3Dindex%25284%2529.html%26cd%3Dattachment%26ts%3D495255%26p%3Dfs%26cid%3D1%26sig%3D3ad4bc9526781c2c50f8275aebd235a633a1b126498988ea64adc74d1aa7690d%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="f65fb6da6ad34e0b92f944df968" src="//local.adguard.org?ts=1782918007308&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000001bd8722f95b140d031696d71%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D495230%26p%3Dfs%26cid%3D1%26sig%3Dc02563103d93bf02377bf5e786f0cf955e9587e7ea4734d255992a1a89140e3e%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="8252059da1ee432197661859b7d" src="//local.adguard.org?ts=1782827329587&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script>
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {
+        if (document.scripts[j].src === r) { return; }
+      }
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+
+    ym(110313964, 'init', {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/110313964" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+  <!-- /Yandex.Metrika counter -->
+
+</head>
 <body>
   <main class="page">
     <header class="topbar" aria-label="Фабрика Английского">
@@ -1169,6 +1192,13 @@
     };
 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzY2NdD0aNaXXWVBtDG_dechUKi7ElmuB4QMtbafRkkQaAWbEA0Sq8mi1F5fQGvizCcaA/exec";
+    const METRIKA_COUNTER_ID = 110313964;
+
+    function reachGoal(goalName, params = {}) {
+      if (typeof window.ym === "function") {
+        window.ym(METRIKA_COUNTER_ID, "reachGoal", goalName, params);
+      }
+    }
     const totalTime = 15 * 60;
     let currentIndex = 0;
     let answers = Array(questions.length).fill(null);
@@ -1309,6 +1339,10 @@
         wrongTopicCounts
       };
 
+      const metrikaLevelKey = levelKey.replace("+", "plus");
+      reachGoal("finish_test", { level: levelKey, score, total: questions.length });
+      reachGoal(`result_${metrikaLevelKey}`, { level: levelKey, score, total: questions.length });
+
       document.getElementById("resultLevel").textContent = result.title;
       document.getElementById("resultDescription").textContent = result.shortDescription;
       document.getElementById("scoreLine").textContent = `${score}/${questions.length} правильных`;
@@ -1336,6 +1370,7 @@
     document.getElementById("goRulesBtn").addEventListener("click", () => showScreen("rules"));
     document.getElementById("backToStartBtn").addEventListener("click", () => showScreen("start"));
     document.getElementById("startTestBtn").addEventListener("click", () => {
+      reachGoal("start_test");
       resetTest();
       showScreen("test");
       startTimer();
@@ -1367,10 +1402,12 @@
     });
 
     document.getElementById("scrollToFormatsBtn").addEventListener("click", () => {
+      reachGoal("click_formats");
       document.getElementById("formatsBlock").scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
     document.getElementById("restartBtn").addEventListener("click", () => {
+      reachGoal("restart_test");
       resetTest();
       showScreen("rules");
     });
@@ -1421,6 +1458,12 @@
           body: JSON.stringify(payload)
         });
 
+        reachGoal("submit_form", {
+          level: lastResult.levelKey,
+          score: lastResult.score,
+          total: lastResult.total,
+          goal: payload.goal || ""
+        });
         formSuccess.textContent = "Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.";
         formSuccess.classList.add("show");
         form.reset();
@@ -1434,6 +1477,11 @@
       }
     });
 
+    document.querySelectorAll('a[href="https://englishfactory.ru"]').forEach(link => {
+      link.addEventListener("click", () => reachGoal("click_tariff_link"));
+    });
+
+    reachGoal("view_test");
     updateTimer();
     renderQuestion();
   </script>
