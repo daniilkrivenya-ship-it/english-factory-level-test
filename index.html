@@ -823,6 +823,14 @@
       border-bottom-color: rgba(160, 28, 23, .72);
     }
 
+    .field-hint {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
     .btn-primary:disabled,
     .btn-primary[disabled] {
       background: #d8dce3;
@@ -955,6 +963,20 @@
 
 </head>
 <body>
+<!-- Top.Mail.Ru counter -->
+<script type="text/javascript">
+var _tmr = window._tmr || (window._tmr = []);
+_tmr.push({id: "3789701", type: "pageView", ecommerce: "sign_up_page", start: (new Date()).getTime()});
+(function (d, w, id) {
+  if (d.getElementById(id)) return;
+  var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+  ts.src = "https://top-fwz1.mail.ru/js/code.js";
+  var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+  if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+})(document, window, "tmr-code");
+</script>
+<noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3789701;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript>
+<!-- /Top.Mail.Ru counter -->
   <main class="page">
     <header class="topbar" aria-label="Фабрика Английского">
       <div class="brand">
@@ -1051,29 +1073,23 @@
           <form id="leadForm">
             <div class="form-grid">
               <div class="field">
-                <label for="name">Имя</label>
-                <input id="name" name="name" autocomplete="name" placeholder="Например, Анна" required />
-              </div>
-              <div class="field">
-                <label for="contact">Телефон или Telegram</label>
-                <input id="contact" name="contact" placeholder="+7... или @username" required />
-              </div>
-              <div class="field">
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" />
-              </div>
-              <div class="field">
-                <label for="goal">Цель изучения</label>
+                <label for="goal">Какая у вас цель?</label>
                 <select id="goal" name="goal" required>
-                  <option value="" selected disabled>Выберите вариант</option>
-                  <option>Для работы</option>
-                  <option>Для путешествий</option>
-                  <option>Для переезда</option>
-                  <option>Для экзамена</option>
-                  <option>Для общения</option>
-                  <option>Хочу подтянуть общий уровень</option>
-                  <option>Пока не знаю</option>
+                  <option value="" selected disabled>Выберите направление</option>
+                  <option>Подготовка к ОГЭ, ЕГЭ и олимпиадам</option>
+                  <option>Английский для жизни и работы за рубежом</option>
+                  <option>Английский в своём темпе</option>
+                  <option>Пока не знаю / другая цель</option>
                 </select>
+              </div>
+              <div class="field">
+                <label for="name">Ваше имя</label>
+                <input id="name" name="name" autocomplete="name" placeholder="Как к вам обращаться" required />
+              </div>
+              <div class="field full">
+                <label for="contact">Как с вами связаться?</label>
+                <input id="contact" name="contact" placeholder="@username, ссылка, почта или телефон" required />
+                <small class="field-hint">Укажите ваш ник в Telegram, профиль в VK, почту или номер телефона.</small>
               </div>
               <div class="field full">
                 <label class="consent-field" for="personalConsent">
@@ -1413,14 +1429,20 @@
     });
 
 
-    const personalConsent = document.getElementById("personalConsent");
     const leadSubmitBtn = document.getElementById("leadSubmitBtn");
+    const leadForm = document.getElementById("leadForm");
 
-    personalConsent.addEventListener("change", () => {
-      leadSubmitBtn.disabled = !personalConsent.checked;
+    const updateLeadSubmitState = () => {
+      leadSubmitBtn.disabled = !leadForm.checkValidity();
+    };
+
+    leadForm.querySelectorAll("input, select").forEach(field => {
+      field.addEventListener("input", updateLeadSubmitState);
+      field.addEventListener("change", updateLeadSubmitState);
     });
+    updateLeadSubmitState();
 
-    document.getElementById("leadForm").addEventListener("submit", async (event) => {
+    leadForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const form = event.currentTarget;
@@ -1433,10 +1455,11 @@
         return;
       }
 
+      const contact = document.getElementById("contact").value.trim();
       const payload = {
         name: document.getElementById("name").value.trim(),
-        contact: document.getElementById("contact").value.trim(),
-        email: document.getElementById("email").value.trim(),
+        contact,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact) ? contact : "",
         goal: document.getElementById("goal").value,
         level: lastResult.levelTitle,
         score: `${lastResult.score}/${lastResult.total}`,
@@ -1467,13 +1490,13 @@
         formSuccess.textContent = "Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.";
         formSuccess.classList.add("show");
         form.reset();
-        personalConsent.checked = false;
+        updateLeadSubmitState();
       } catch (error) {
         formSuccess.textContent = "Не удалось отправить заявку. Попробуйте еще раз или напишите нам напрямую.";
         formSuccess.classList.add("show");
       } finally {
         submitButton.textContent = "Отправить";
-        submitButton.disabled = !personalConsent.checked;
+        updateLeadSubmitState();
       }
     });
 
