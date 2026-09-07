@@ -938,6 +938,61 @@
       .lead-form, .formats, .restart-card, .analysis-card { padding: 28px; }
       .result-card { padding: 34px; }
     }
+    .cookie-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+  max-width: 900px;
+  margin: 0 auto;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(31, 36, 48, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.cookie-banner.is-visible {
+  display: flex;
+}
+
+.cookie-banner p {
+  margin: 0;
+  color: #404959;
+  line-height: 1.45;
+  font-size: 14px;
+}
+
+.cookie-banner a {
+  color: var(--blue-dark);
+  font-weight: 800;
+}
+
+.cookie-banner .btn-primary {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 12px 18px;
+}
+
+@media (max-width: 680px) {
+  .cookie-banner {
+    align-items: stretch;
+    flex-direction: column;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .cookie-banner .btn-primary {
+    width: 100%;
+  }
+}
   </style>
 </head>
   
