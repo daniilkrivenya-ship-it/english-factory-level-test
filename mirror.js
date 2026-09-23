@@ -185,6 +185,38 @@
     );
   };
 
+  const sendGoogleBackup = (googlePayload) => {
+    const body = JSON.stringify(googlePayload);
+
+    try {
+      if (
+        navigator.sendBeacon &&
+        navigator.sendBeacon(
+          GOOGLE_ENDPOINT,
+          new Blob([body], {
+            type: 'text/plain;charset=UTF-8'
+          })
+        )
+      ) {
+        return;
+      }
+    } catch (error) {
+      console.warn('sendBeacon Google backup failed:', error);
+    }
+
+    nativeFetch(GOOGLE_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body,
+      keepalive: true
+    }).catch((error) => {
+      console.warn('CRM saved, but Google backup failed:', error);
+    });
+  };
+
   const buildMirrorPayload = (
     googlePayload
   ) => {
@@ -266,6 +298,9 @@
       consent_version:
         '2026-09-04',
 
+      client_version:
+        'test-20260923-1',
+
       website: '',
 
       original_payload:
@@ -326,9 +361,13 @@
         mirrorPayload
       );
 
-      return nativeFetch(
-        input,
-        init
+      sendGoogleBackup(
+        googlePayload
+      );
+
+      return new Response(
+        null,
+        { status: 204 }
       );
     })();
   };
