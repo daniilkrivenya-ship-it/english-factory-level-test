@@ -74,6 +74,8 @@
       --radius: 28px;
       --radius-small: 18px;
       --max: 1040px;
+      --display-font: "Akrobat", Arial, sans-serif;
+      --text-font: Arial, "Helvetica Neue", sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -82,7 +84,7 @@
 
     body {
       margin: 0;
-      font-family: "Akrobat", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--text-font);
       color: var(--ink);
       background:
         radial-gradient(circle at 8% 8%, rgba(89, 145, 203, 0.24), transparent 32%),
@@ -91,6 +93,8 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
+
+    h1, h2, h3, h4, .brand-text { font-family: var(--display-font); }
 
     body::before,
     body::after {
@@ -328,7 +332,7 @@
       justify-content: center;
       gap: 8px;
       line-height: 1;
-      font-family: inherit;
+      font-family: var(--display-font);
     }
 
     button:active,
@@ -880,17 +884,24 @@
     }
 
     .format-card p {
-      margin: 0 0 12px;
+      margin: 0;
       color: #4b5565;
+      font-size: 14px;
       line-height: 1.42;
     }
 
-    .price {
-      display: block;
-      margin: 0 0 14px;
-      color: var(--red);
-      font-weight: 950;
-      font-size: 18px;
+    .format-card .price {
+      margin-bottom: 8px;
+    }
+
+    .price strong {
+      color: #204e7c;
+      font-size: 20px;
+      white-space: nowrap;
+    }
+
+    .formats .actions {
+      margin-top: 14px;
     }
 
     .restart-card {
@@ -933,8 +944,6 @@
       .form-grid { grid-template-columns: 1fr 1fr; }
       .field.full { grid-column: 1 / -1; }
       .format-grid { grid-template-columns: repeat(3, 1fr); }
-      .format-card { display: flex; flex-direction: column; }
-      .format-card .btn { margin-top: auto; }
       .lead-form, .formats, .restart-card, .analysis-card { padding: 28px; }
       .result-card { padding: 34px; }
     }
@@ -1072,7 +1081,7 @@
           <div class="score-line" id="scoreLine"></div>
           <div class="result-actions">
             <button class="btn-primary" type="button" id="scrollToLeadBtn">Получить рекомендацию</button>
-            <button class="btn-secondary" type="button" id="scrollToFormatsBtn">Посмотреть форматы</button>
+            <button class="btn-secondary" type="button" id="scrollToFormatsBtn">Посмотреть цены</button>
           </div>
         </div>
 
@@ -1087,19 +1096,42 @@
           </div>
         </div>
 
+        <div class="card formats" id="formatsBlock">
+          <h3>Форматы и цены</h3>
+          <div class="format-grid">
+            <article class="format-card">
+              <h4>Групповые занятия</h4>
+              <p class="price"><strong>от 7 990 ₽</strong> за 4 недели</p>
+              <p>8 занятий по 75 минут</p>
+            </article>
+            <article class="format-card">
+              <h4>Индивидуальные занятия</h4>
+              <p class="price"><strong>9 590 ₽</strong> за месяц</p>
+              <p>360 минут занятий и разговорный клуб в подарок</p>
+            </article>
+            <article class="format-card">
+              <h4>Разговорный клуб</h4>
+              <p class="price"><strong>3 200 ₽</strong> за 4 недели</p>
+              <p>4 встречи по 60 минут</p>
+            </article>
+          </div>
+          <div class="actions">
+            <a class="btn btn-secondary" id="comparePricingLink" href="https://school.englishfactory.ru/#tarify" target="_blank" rel="noopener">Сравнить тарифы</a>
+          </div>
+        </div>
+
         <div class="card lead-form" id="leadFormBlock">
           <h3>Получить рекомендацию по обучению</h3>
-          <p class="muted">Оставьте контакт, и мы подскажем, какой формат занятий подойдет под ваш уровень и цель.</p>
+          <p class="muted">Оставьте контакты, и мы поможем выбрать формат занятий.</p>
           <form id="leadForm">
             <div class="form-grid">
               <div class="field">
-                <label for="goal">Какая у вас цель?</label>
-                <select id="goal" name="goal" required>
-                  <option value="" selected disabled>Выберите направление</option>
-                  <option>Подготовка к ОГЭ, ЕГЭ и олимпиадам</option>
-                  <option>Английский для жизни и работы за рубежом</option>
-                  <option>Английский в своём темпе</option>
-                  <option>Пока не знаю / другая цель</option>
+                <label for="goal">Формат обучения</label>
+                <select id="goal" name="goal">
+                  <option value="Пока не знаю">Помогите выбрать</option>
+                  <option>Групповые занятия</option>
+                  <option>Индивидуальные занятия</option>
+                  <option>Разговорный клуб</option>
                 </select>
               </div>
               <div class="field">
@@ -1123,31 +1155,6 @@
             </div>
             <div class="form-success" id="formSuccess">Спасибо! Мы получили вашу заявку. Скоро свяжемся с вами и подскажем подходящий формат обучения.</div>
           </form>
-        </div>
-
-        <div class="card formats" id="formatsBlock">
-          <h3>Форматы обучения</h3>
-          <p class="muted">Выберите формат, который ближе к вашей цели. Подробности и оплату можно оформить на основном сайте.</p>
-          <div class="format-grid">
-            <div class="format-card">
-              <h4>С сопровождением</h4>
-              <p>Стоимость уточняется после подбора программы.</p>
-              <span class="price">По запросу</span>
-              <a class="btn btn-secondary" href="https://school.englishfactory.ru" target="_blank" rel="noopener">Подробнее</a>
-            </div>
-            <div class="format-card">
-              <h4>Групповой формат</h4>
-              <p>Для тех, кому нужна система, регулярность и разговорная практика.</p>
-              <span class="price">от 999 ₽ / месяц</span>
-              <a class="btn btn-primary" href="https://school.englishfactory.ru" target="_blank" rel="noopener">Записаться в группу</a>
-            </div>
-            <div class="format-card">
-              <h4>Персональный формат</h4>
-              <p>Для тех, кому нужен индивидуальный план и точечная работа с ошибками.</p>
-              <span class="price">от 1199 ₽ / занятие</span>
-              <a class="btn btn-secondary" href="https://school.englishfactory.ru" target="_blank" rel="noopener">Оставить заявку</a>
-            </div>
-          </div>
         </div>
 
         <div class="card restart-card">
@@ -1543,9 +1550,7 @@
       }
     });
 
-    document.querySelectorAll('a[href="https://englishfactory.ru"]').forEach(link => {
-      link.addEventListener("click", () => reachGoal("click_tariff_link"));
-    });
+    document.getElementById("comparePricingLink").addEventListener("click", () => reachGoal("click_tariff_link"));
 
     reachGoal("view_test");
     updateTimer();
